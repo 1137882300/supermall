@@ -10,7 +10,7 @@ const Profile = () => import('../views/profile/Profile')
 Vue.use(VueRouter)
 
 //2.创建router
-const routers = [
+const routes = [
   {
     path: '',
     redirect: '/home'
@@ -34,7 +34,7 @@ const routers = [
 ]
 
 const router = new VueRouter({
-  routers,
+  routes,
   mode: 'history'
 
 })
