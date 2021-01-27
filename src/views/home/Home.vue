@@ -2,15 +2,22 @@
   <div id="home" class="wrapper">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
 
-    <scroll class="content" ref="scroll">
+    <scroll class="content"
+            ref="scroll"
+            :probe-type="3"
+            @scroll="contentScroll"
+            :pull-up-load="true"
+            @pullingUp="loadMore">
       <home-swiper :banners="banners"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
+      <tab-control class="tab-control"
+                   :titles="['流行','新款','精选']"
+                   @tabClick="tabClick"/>
       <goods-list :goods="showGoods"/>
     </scroll>
 <!--.native 加上这个才能监听组件的点击事件-->
-    <back-top @click.native="backClick"/>
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
 
   </div>
 </template>
@@ -51,7 +58,8 @@
           'new':{page: 0,list: []},
           'sell':{page: 0,list: []},
         },
-        currentType: 'pop'
+        currentType: 'pop',
+        isShowBackTop: false,
       }
     },
     computed:{
@@ -88,13 +96,20 @@
       backClick(){
         this.$refs.scroll.scrollTo(0,0,1000)
       },
+      contentScroll(position){
+         this.isShowBackTop = (-position.y) > 1000
+      },
+      loadMore(){
+        this.getHomeGoods(this.currentType)
+        /*刷新一下 BS重新计算高度*/
+        this.$refs.scroll.scroll.refresh()
+      },
 
        /**
        * 网络请求相关方法
        */
       getHomeMultidata(){
         getHomeMultidata().then(res =>{
-          // this.result = res
           this.banners = res.data.banner.list
           this.recommends = res.data.recommend.list
         })
@@ -104,6 +119,8 @@
         getHomeGoods(type,page).then(res=>{
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1
+
+          this.$refs.scroll.finishPullUp()
         })
       }
     }
