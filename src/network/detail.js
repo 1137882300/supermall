@@ -10,6 +10,6 @@ export function getDetail(iid) {
 }
 
 export class Goods {
-  
-  
+
+
 }
